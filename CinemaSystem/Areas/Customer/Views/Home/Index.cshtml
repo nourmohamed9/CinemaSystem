@@ -1,0 +1,68 @@
+﻿@using CinemaSystem.Areas.Customer.Models
+@model indexVm
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <a asp-area="Customer" asp-controller="Home" asp-action="MyBookings" href="/Customer/Home/MyBookings" class="btn btn-success mb-4">
+        My Bookings
+    </a>
+    <form method="get" asp-controller="Home" asp-action="Book">
+        <div class="container mt-5">
+            <h1 class="mb-4">All Movies</h1>
+            <div class="row">
+                @foreach (var i in Model.movies)
+
+                {
+
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img class="card-img-top" src="~/images/movie/@i.MainImg" height="200" alt="Movie 1" />
+                            <div class="card-body">
+                                <h5 class="card-title">@i.Name</h5>
+                                <p class="card-text">@i.Description</p>
+                                <input type="hidden" name="id" value="@i.ID" />
+                                <a asp-area="Customer" asp-controller="Home" asp-action="Book" asp-route-id="@i.ID" href="/Customer/Home/Book/@i.ID" class="btn btn-primary w-100">
+                                    Book
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+
+
+            </div>
+        </div>
+    </form>
+    <div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled":null)">
+                    <a class="page-link" href="/Customer/Home/index?page=@(Model.CurrentPage - 1)">Previous</a>
+                </li>
+                @for(int i =1 ; i<=Model.Count;i++)
+                {
+                    <li class="page-item"><a class="page-link  @(Model.CurrentPage == i ? "active" : null) " href="/Customer/Home/index?page=@i">@i</a></li>
+                    
+                }
+                
+                <li class="page-item @(Model.CurrentPage == Model.Count ? "disabled" : null)">
+                    <a class="page-link" href="/Customer/Home/index?page=@(Model.CurrentPage+1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

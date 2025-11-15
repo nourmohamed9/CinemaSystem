@@ -1,0 +1,55 @@
+﻿@model CinemaSystem.Areas.Admin.Models.Cinema
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Edit Cinema Details</h2>
+
+        <form asp-action="EditCinema" asp-controller="Home" asp-area="Admin" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.ID" />
+
+            <div class="card shadow-lg p-4 mb-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Cinema Name</label>
+                    <input type="text" name="Name" value="@Model.Name" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Location</label>
+                    <input type="text" name="Location" value="@Model.Location" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Current Image</label>
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="~/images/cinema/@Model.ImageUrl" class="img-fluid rounded border shadow-sm" alt="@Model.Name" style="max-height:200px;" />
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Change Image</label>
+                    <input type="file" name="Img" class="form-control" accept="image/*" />
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    <a asp-action="Index" asp-area="Admin" asp-controller="Home" class="btn btn-secondary px-4 ms-2">Back</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

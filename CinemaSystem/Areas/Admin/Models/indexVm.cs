@@ -1,0 +1,10 @@
+﻿namespace CinemaSystem.Areas.Admin.Models
+{
+    public class indexVm
+    {
+        public List<Actor>? actors { get; set; }
+        public List<Cinema>? cinemas { get; set; }
+        public List<Category>? categories { get; set; }
+        public List<Movie>? movies { get; set; }
+    }
+}

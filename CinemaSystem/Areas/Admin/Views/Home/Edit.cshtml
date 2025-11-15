@@ -1,0 +1,87 @@
+﻿@using CinemaSystem.Areas.Admin.Models
+@model indexVm
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Edit Movie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Edit Movie Details</h2>
+
+        <form asp-action="Edit" asp-controller="Home" asp-area="Admin" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.movies.FirstOrDefault()?.ID" />
+
+            <div class="card shadow-lg p-4 mb-4">
+                <div class="row">
+                    <!-- Left: Movie info -->
+                    <div class="col-md-6">
+                        @{
+                            var movie = Model.movies.FirstOrDefault();
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Movie Name</label>
+                            <input type="text" name="Name" value="@movie?.Name" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea name="Description" rows="4" class="form-control">@movie?.Description</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Category</label>
+                            <select name="CategoryID" class="form-select" required>
+                                @foreach (var cat in Model.categories)
+                                {
+                                    <option value="@cat.ID" @(cat.ID == movie?.category?.ID ? "selected" : "")>@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Cinema</label>
+                            <select name="CinemaID" class="form-select" required>
+                                @foreach (var cin in Model.cinemas)
+                                {
+                                    <option value="@cin.ID" @(cin.ID == movie?.cinemas?.ID ? "selected" : "")>@cin.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right: Images -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Current Main Image</label>
+                        <div class="mb-3">
+                            <img src="~/images/movie/@movie?.MainImg" class="img-fluid rounded border shadow-sm" alt="@movie?.Name" style="max-height:250px;" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Change Main Image</label>
+                            <input type="file" name="formFile" class="form-control" accept="image/*" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Add Sub Images</label>
+                            <input type="file" name="subimgs" class="form-control" multiple accept="image/*" />
+                            <div class="form-text text-muted">You can upload multiple images.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    <a asp-action="Index" asp-area="Admin" asp-controller="Home" class="btn btn-secondary px-4 ms-2">Back</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
