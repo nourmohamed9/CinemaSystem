@@ -1,3 +1,9 @@
+
+using CinemaSystem.DataAcess;
+using CinemaSystem.Models;
+using CinemaSystem.Repositories.IRepositories;
+using CinemaSystem.Repository;
+using Microsoft.EntityFrameworkCore;
 namespace CinemaSystem
 {
     public class Program
@@ -5,9 +11,38 @@ namespace CinemaSystem
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString =
+                  builder.Configuration.GetConnectionString("DefaultConnection")
+                      ?? throw new InvalidOperationException("Connection string"
+                      + "'DefaultConnection' not found.");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
+            builder.Services.AddControllersWithViews();
+
+            // Authorization
+            builder.Services.AddAuthorization();
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            /*  builder.Services.AddControllersWithViews();
+              builder.Services.AddScoped<IRepository<Movie>, Repository<Movie>>();
+              builder.Services.AddScoped<IRepository<Cinema>, Repository<Cinema>>();
+              builder.Services.AddScoped<IRepository<Actor>, Repository<Actor>>();
+              builder.Services.AddScoped<IRepository<Booking>, Repository<Booking>>();
+              builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();*/
+
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Movie>, Repository<CinemaSystem.Models.Movie>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Cinema>, Repository<CinemaSystem.Models.Cinema>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Actor>, Repository<CinemaSystem.Models.Actor>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Category>, Repository<CinemaSystem.Models.Category>>();
+            builder.Services.AddScoped<IRepository<Booking>, Repository<Booking>>();
+
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Movie>, Repository<CinemaSystem.Models.Movie>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Cinema>, Repository<CinemaSystem.Models.Cinema>>();
+            builder.Services.AddScoped<IRepository<Models.Actor>, Repository<Models.Actor>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Category>, Repository<CinemaSystem.Models.Category>>();
+            builder.Services.AddScoped<IRepository<CinemaSystem.Models.Booking>, Repository<CinemaSystem.Models.Booking>>();
+
 
             var app = builder.Build();
 

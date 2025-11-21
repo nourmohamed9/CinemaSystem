@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CinemaSystem.Areas.Admin.Models
+namespace CinemaSystem.Models
 {
     public class Movie
     {

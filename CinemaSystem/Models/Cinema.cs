@@ -1,4 +1,4 @@
-﻿namespace CinemaSystem.Areas.Customer.Models
+﻿namespace CinemaSystem.Models
 {
     public class Cinema
     {

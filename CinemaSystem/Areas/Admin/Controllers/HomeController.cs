@@ -1,9 +1,9 @@
-﻿using CinemaSystem.Areas.Admin.Data;
-using CinemaSystem.Areas.Admin.Models;
-
+﻿
+using CinemaSystem.DataAcess;
+using CinemaSystem.Models;
+using CinemaSystem.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Linq.Expressions;
 
 
 namespace CinemaSystem.Areas.Admin.Controllers
@@ -11,30 +11,59 @@ namespace CinemaSystem.Areas.Admin.Controllers
     [Area("Admin")]
     public class HomeController : Controller
     {
-        ApplicationDbContext _context = new ApplicationDbContext();
-        public IActionResult Index(Models.Movie movie)
+        ApplicationDbContext _context;// = new ApplicationDbContext();
+        private IRepository<Cinema> _CinemaRepository;
+        private IRepository<Actor> _ActorRepository;
+        private IRepository<Category> _categoryRepository;
+        private IRepository<Movie> _movieRepository;
+        private IRepository<Booking> _bookingRepository;
+        public HomeController(IRepository<Cinema> CinemaRepository, IRepository<Actor> ActorRepository, IRepository<Category> categoryRepository, IRepository<Movie> movieRepository, IRepository<Booking> bookingRepository)
         {
-            var model = _context.movies.Include(e => e.category).Include(e => e.cinemas).Include(e => e.actors).ToList();
+            _ActorRepository = ActorRepository;
+            _categoryRepository = categoryRepository;
+            _movieRepository = movieRepository;
+            _CinemaRepository = CinemaRepository;
+            _bookingRepository = bookingRepository;
+        }
+        public async Task<IActionResult> Index(Models.Movie movie)
+        {
+            // var model = _context.movies.Include(e => e.category).Include(e => e.cinemas).Include(e => e.actors).ToList();
+            // var model = await _movieRepository.GetAsync(includes: [e => e.category, e => e.cinemas, e => e.actors]);
+            var model = await _movieRepository.GetAsync(
+                includes: new Expression<Func<Movie, object>>[] { e => e.category, e => e.cinemas, e => e.actors }
+            );
+
             if (model == null) return NotFound();
             return View(model);
         }
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var movie = _context.movies
-         .Include(e => e.category)
-         .Include(e => e.cinemas)
-         .Include(e => e.actors).AsNoTracking()
-         .FirstOrDefault(e => e.ID == id);
-
+            /* var movie = _context.movies
+          .Include(e => e.category)
+          .Include(e => e.cinemas)
+          .Include(e => e.actors).AsNoTracking()
+          .FirstOrDefault(e => e.ID == id);*/
+            // var movie = await _movieRepository.GetOneAsync(expression: e => e.ID == id, includes: [e => e.category, e => e.cinemas, e => e.actors]);//
+            var movie = await _movieRepository.GetOneAsync(
+               e => e.ID == id,
+               includes: new Expression<Func<Movie, object>>[] { e => e.category, e => e.cinemas, e => e.actors });
             if (movie == null) return NotFound();
 
-            var viewModel = new indexVm
+           /* var viewModel = new indexVm
             {
                 movies = new List<Movie> { movie }, // خاصية واحدة بدل movies
                 categories = _context.categories.ToList(),
                 cinemas = _context.cinemas.ToList(),
                 actors = _context.actors.ToList()
+            };*/
+           
+            var viewModel = new indexVm
+            {
+                movies = new List<Movie> { movie },
+                categories = (await _categoryRepository.GetAsync()).ToList(),
+                cinemas = (await _CinemaRepository.GetAsync()).ToList(),
+                actors = (await _ActorRepository.GetAsync()).ToList()
             };
             return View(viewModel);
         }
@@ -99,15 +128,19 @@ namespace CinemaSystem.Areas.Admin.Controllers
 
       }*/
         [HttpPost]
-        public IActionResult Edit(int id, Movie movie, IFormFile? formFile, List<IFormFile>? subimgs)
+        public async Task<IActionResult> Edit(int id, Movie movie, IFormFile? formFile, List<IFormFile>? subimgs)
         {
             // جلب الفيلم من قاعدة البيانات مع جميع العلاقات
-            var movieInDb = _context.movies
+           /* var movieInDb = _context.movies
                 .Include(m => m.category)
                 .Include(m => m.cinemas)
                 .Include(m => m.actors)
-                .FirstOrDefault(m => m.ID == id);
-
+                .FirstOrDefault(m => m.ID == id);*/
+          //  var movieInDb = await _movieRepository.GetOneAsync(expression: e => e.ID == id, includes: [e => e.category, e => e.cinemas, e => e.actors]);//
+            var movieInDb = await _movieRepository.GetOneAsync(
+              e => e.ID == id,
+              includes: new Expression<Func<Movie, object>>[] { e => e.category, e => e.cinemas, e => e.actors }
+          );
             if (movieInDb == null)
                 return NotFound();
 
@@ -143,7 +176,8 @@ namespace CinemaSystem.Areas.Admin.Controllers
             movieInDb.cinemaId = movie.cinemaId;
             movieInDb.ActorId = movie.ActorId;
 
-            _context.SaveChanges();
+            //_context.SaveChanges();
+          await  _movieRepository.CommitAsync();
 
             // تحديث الصور الفرعية إذا تم رفع صور جديدة
             if (subimgs != null && subimgs.Count > 0)
@@ -165,7 +199,8 @@ namespace CinemaSystem.Areas.Admin.Controllers
                     //    Img = subFileName
                     //});
                 }
-                _context.SaveChanges();
+                //_context.SaveChanges();
+             await   _movieRepository.CommitAsync();
             }
 
             return RedirectToAction("Index");
@@ -185,18 +220,21 @@ namespace CinemaSystem.Areas.Admin.Controllers
 
              return RedirectToAction("Index");
          }*/
-        public IActionResult Delete(int ID)
+        public async Task<IActionResult> Delete(int ID)
         {
             // 1. جلب الفيلم
-            var movie = _context.movies.FirstOrDefault(e => e.ID == ID);
+          //  var movie = _context.movies.FirstOrDefault(e => e.ID == ID);
+            var movie = await _movieRepository.GetOneAsync(e=>e.ID == ID);
             if (movie == null)
                 return NotFound(); // لو الفيلم مش موجود
 
             // 2. حذف أي حجوزات مرتبطة بالفيلم
-            var bookings = _context.bookings.Where(b => b.MovieId == ID).ToList();
+           //var bookings = _context.bookings.Where(b => b.MovieId == ID).ToList();
+            var bookings =await  _bookingRepository.GetAsync(e => e.MovieId == ID);
             foreach (var b in bookings)
             {
-                _context.bookings.Remove(b);
+               // _context.bookings.Remove(b);
+                _bookingRepository.DeleteAsync(b);
             }
 
             // 3. حذف الصورة الرئيسية من السيرفر
@@ -208,11 +246,12 @@ namespace CinemaSystem.Areas.Admin.Controllers
             }
 
             // 4. حذف الفيلم نفسه
-            _context.movies.Remove(movie);
-
+           // _context.movies.Remove(movie);
+           // _movieRepository.DeleteAsync(movie);
             // 5. حفظ التغييرات
-            _context.SaveChanges();
-
+           // _context.SaveChanges();
+            await _bookingRepository.CommitAsync();
+            await _movieRepository.CommitAsync();
             return RedirectToAction("Index");
         }
         public IActionResult DashBoard()
@@ -220,9 +259,14 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult EditCategory(int id)
+        public async Task<IActionResult> EditCategory(int id)
         {
-            var movie = _context.movies.Include(e => e.category).AsEnumerable().FirstOrDefault(e => e.ID == id);
+            //var movie = _context.movies.Include(e => e.category).AsEnumerable().FirstOrDefault(e => e.ID == id);
+          //  var movie = await _movieRepository.GetOneAsync(expression: e => e.ID == id, includes: [e=>e.category]);
+            var movie = await _movieRepository.GetOneAsync(
+                e => e.ID == id,
+                includes: new Expression<Func<Movie, object>>[] { e => e.category }
+            );
             if (movie == null) return NotFound();
             /*var index = new indexVm
             {
@@ -234,34 +278,41 @@ namespace CinemaSystem.Areas.Admin.Controllers
         }
      
         [HttpPost]
-        public IActionResult EditCategory(int id, Category categoryForm)
+        public async Task<IActionResult> EditCategory(int id, Category categoryForm)
         {
             //  
-            var category = _context.categories.FirstOrDefault(c => c.ID == id);
+            //var category = _context.categories.FirstOrDefault(c => c.ID == id);
+            var category = await _categoryRepository.GetOneAsync(expression: c => c.ID == id);
             if (category == null) return NotFound();
 
             //
             category.Name = categoryForm.Name;
             category.Description = categoryForm.Description;
 
-            _context.SaveChanges(); // 
-
+           // _context.SaveChanges(); // 
+           await _categoryRepository.CommitAsync();
             // 
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult EditCinema(int id )
+        public async Task<IActionResult> EditCinema(int id )
         {
-            var c = _context.movies.Include(e=>e.cinemas).FirstOrDefault(c => c.ID == id);
+            //var c = _context.movies.Include(e=>e.cinemas).FirstOrDefault(c => c.ID == id);
+            //var c =await  _movieRepository.GetOneAsync(expression: c => c.ID == id, includes: [e => e.cinemas]);
+            var c = await _movieRepository.GetOneAsync(
+              e => e.ID == id,
+              includes: new Expression<Func<Movie, object>>[] { e => e.cinemas }
+          );
             if (c == null) return NotFound();
             return View(c.cinemas);
 
         }
         [HttpPost]
-        public IActionResult EditCinema(int id,Cinema cinema, IFormFile? Img)
+        public async Task<IActionResult> EditCinema(int id,Cinema cinema, IFormFile? Img)
         {
 
-            var c = _context.cinemas.FirstOrDefault(c => c.ID == id);
+            //var c = _context.cinemas.FirstOrDefault(c => c.ID == id);
+            var c = await _CinemaRepository.GetOneAsync(expression: c => c.ID == id);
             if (c == null) return NotFound();
             c.Name = cinema.Name;
             c.Location = cinema.Location;
@@ -286,7 +337,8 @@ namespace CinemaSystem.Areas.Admin.Controllers
             {
                 c.ImageUrl = cinema.ImageUrl;
             }
-                _context.SaveChanges();
+               // _context.SaveChanges();
+          await  _categoryRepository.CommitAsync();
             return RedirectToAction("Index");
         }
 

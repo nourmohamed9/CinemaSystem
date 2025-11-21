@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CinemaSystem.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace CinemaSystem.Areas.Customer.Models
+namespace CinemaSystem.Models
 {
     public class Booking
     {
