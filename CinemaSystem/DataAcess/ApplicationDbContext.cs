@@ -1,9 +1,10 @@
 ﻿using CinemaSystem.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaSystem.DataAcess
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Actor> actors { get; set; }
         public DbSet<Cinema> cinemas { get; set; }
