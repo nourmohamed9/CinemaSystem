@@ -3,7 +3,9 @@ using CinemaSystem.DataAcess;
 using CinemaSystem.Models;
 using CinemaSystem.Repositories.IRepositories;
 using CinemaSystem.Repository;
+using CinemaSystem.Utilies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 namespace CinemaSystem
 {
@@ -25,7 +27,7 @@ namespace CinemaSystem
             {
                 confi.User.RequireUniqueEmail = true;
                 confi.Password.RequiredLength = 7;
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); 
 
             // Authorization
             builder.Services.AddAuthorization();
@@ -50,8 +52,8 @@ namespace CinemaSystem
             builder.Services.AddScoped<IRepository<CinemaSystem.Models.Category>, Repository<CinemaSystem.Models.Category>>();
             builder.Services.AddScoped<IRepository<CinemaSystem.Models.Booking>, Repository<CinemaSystem.Models.Booking>>();
 
-
-            
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.AddScoped<IRepository<ApplicationUserOTP>, Repository< ApplicationUserOTP>>();
 
             var app = builder.Build();
 
