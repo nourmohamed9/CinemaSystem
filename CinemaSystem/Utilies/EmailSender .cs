@@ -14,7 +14,7 @@ namespace CinemaSystem.Utilies
               {
                   EnableSsl = true,
                   UseDefaultCredentials = false,
-                  Credentials = new NetworkCredential("nour.mohamed.91735@gmail.com", "mnla difs jacr evqj")
+                  Credentials = new NetworkCredential("lolo1622005@gmail.com", "tgux yzzi vdjw dvbh")
 
               };
 
