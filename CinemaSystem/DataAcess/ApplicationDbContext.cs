@@ -1,6 +1,8 @@
 ﻿using CinemaSystem.Models;
+using CinemaSystem.Utilies.DBInitializer;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace CinemaSystem.DataAcess
 {
@@ -12,6 +14,8 @@ namespace CinemaSystem.DataAcess
         public DbSet<Category> categories { get; set; }
         public DbSet<Booking> bookings { get; set; }
         public DbSet<ApplicationUserOTP> applicationUserOTPs { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<Promotion> promotions { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
@@ -28,8 +32,7 @@ namespace CinemaSystem.DataAcess
         {
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<CinemaSystem.Models.ValidateOTPVM> ValidateOTPVM { get; set; } = default!;
-        public DbSet<CinemaSystem.Models.ResetPasswordVM> ResetPasswordVM { get; set; } = default!;
+     
        
     }
 }

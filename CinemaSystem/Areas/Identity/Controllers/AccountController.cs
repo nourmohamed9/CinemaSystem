@@ -22,6 +22,12 @@ namespace CinemaSystem.Areas.Identity.Controllers
             _SignInManager = SignInManager;
             _applicationUserOTPRepository = applicationUserOTPRepository;
         }
+        public async Task<IActionResult> Logout()
+        {
+           await  _SignInManager.SignOutAsync();
+            return RedirectToAction("Login");
+
+        }
         [HttpGet]
         public IActionResult Register()
         {
@@ -117,6 +123,8 @@ namespace CinemaSystem.Areas.Identity.Controllers
 
             }
             TempData["success-notification"] = "Welcome Back!";
+            if (User.IsInRole("SuperAdmin"))
+                 return RedirectToAction("Index", "Home", new { area = "Admin" });
             return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
         [HttpGet]

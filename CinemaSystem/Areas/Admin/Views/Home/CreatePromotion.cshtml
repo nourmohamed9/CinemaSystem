@@ -1,0 +1,32 @@
+﻿@model IEnumerable<CinemaSystem.Models.Movie>
+
+<form asp-action="CreatePromotion" method="post">
+    <div class="mb-3">
+        <label>Code</label>
+        <input type="text" name="code" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Discount (%)</label>
+        <input type="number" step="0.01" name="discount" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Movie</label>
+        <select name="movieId" class="form-control" required>
+            <option value="">--Select Movie--</option>
+            @foreach (var movie in Model)
+            {
+                <option value="@movie.ID">@movie.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Valid To</label>
+        <input type="date" name="validTo" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Max Usage</label>
+        <input type="number" name="maxUsage" class="form-control" value="100" />
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Add Promotion</button>
+</form>
+

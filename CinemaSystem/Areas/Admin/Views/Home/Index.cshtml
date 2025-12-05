@@ -1,4 +1,5 @@
 ﻿@using CinemaSystem.Models
+@using CinemaSystem.Utilies
 @model List<Movie>
 
 <!DOCTYPE html>
@@ -45,12 +46,20 @@
                             </p>
                         </div>
                         <div class="card-footer text-center">
-                            <a asp-area="Admin" asp-controller="Home" asp-action="Edit" asp-route-id="@movie.ID" href="/Admin/home/Edit/@movie.ID" class="btn btn-sm btn-warning me-1">Edit</a>
-                           
-                            <a asp-area="Admin" asp-controller="Home" asp-action="Delete" asp-route-id="@movie.ID" href="/Admin/home/Delete/@movie.ID" class="btn btn-sm btn-danger">Delete</a>
-                            <a asp-area="Admin" asp-controller="Home" asp-action="EditCategory" asp-route-id="@movie.ID" href="/Admin/home/EditCategory/@movie.ID" class="btn btn-sm btn-danger">EditCategory</a>
-                            <a asp-area="Admin" asp-controller="Home" asp-action="EditCinema" asp-route-id="@movie.ID" href="/Admin/home/EditCinema/@movie.ID" class="btn btn-sm btn-danger">EditCinema</a>
-                      
+                            @if(User.IsInRole(SD.ADMIN_ROLE) || User.IsInRole(SD.SUPER_ADMIN_ROLE))
+                            {
+                                <a asp-area="Admin" asp-controller="Home" asp-action="Edit" asp-route-id="@movie.ID" href="/Admin/home/Edit/@movie.ID" class="btn btn-sm btn-warning me-1">Edit</a>
+
+                                <a asp-area="Admin" asp-controller="Home" asp-action="Delete" asp-route-id="@movie.ID" href="/Admin/home/Delete/@movie.ID" class="btn btn-sm btn-danger">Delete</a>
+                                <a asp-area="Admin" asp-controller="Home" asp-action="EditCategory" asp-route-id="@movie.ID" href="/Admin/home/EditCategory/@movie.ID" class="btn btn-sm btn-danger">EditCategory</a>
+                                <a asp-area="Admin" asp-controller="Home" asp-action="EditCinema" asp-route-id="@movie.ID" href="/Admin/home/EditCinema/@movie.ID" class="btn btn-sm btn-danger">EditCinema</a>
+
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary" disabled>No action</button>
+
+                            }
                         </div>
                     </div>
                 </div>

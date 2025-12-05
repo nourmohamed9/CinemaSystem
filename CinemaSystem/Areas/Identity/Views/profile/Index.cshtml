@@ -1,0 +1,95 @@
+﻿@model UserInfoVM
+
+<div class="container rounded bg-white mt-5">
+    <div class="row">
+
+        <!-- Profile Image -->
+        <div class="col-md-4 border-right">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                <img class="rounded-circle mt-5" src="https://i.imgur.com/0eg0aG0.jpg" width="90" alt="Profile Image">
+                <span class="font-weight-bold">@Model.Name</span>
+                <span class="text-black-50">@Model.Email</span>
+                <span>@(string.IsNullOrEmpty(Model.Address) ? "N/A" : Model.Address)</span>
+            </div>
+        </div>
+
+        <!-- Profile Info & Password Form -->
+        <div class="col-md-8">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex flex-row align-items-center back">
+                        <i class="fa fa-long-arrow-left mr-1 mb-1"></i>
+                        <h6>Back to home</h6>
+                    </div>
+                    <h6 class="text-right">Edit Profile</h6>
+                </div>
+
+                <!-- Update Profile Form -->
+                <form asp-action="UpdateInfo" method="post">
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="First Name" name="Name" value="@Model.Name">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Username" name="UserName" value="@Model.UserName">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <input type="email" class="form-control" placeholder="Email" name="Email" value="@Model.Email">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Phone Number" name="PhoneNumber" value="@(Model.PhoneNumber ?? "")">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Address" name="Address" value="@(Model.Address ?? "")">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Country" value="USA" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Bank Name" value="Bank of America" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Account Number" value="043958409584095" disabled>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-right">
+                        <button type="submit" class="btn btn-primary profile-button">Save Profile</button>
+                    </div>
+                </form>
+
+                <!-- Change Password Form -->
+                <form asp-action="UpdatePassword" method="post" class="mt-5">
+                    <h6 class="mb-3 text-primary">Change Password</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="CurrentPassword">Current Password</label>
+                                <input type="password" class="form-control" id="CurrentPassword" placeholder="Enter Current Password" name="CurrentPassword">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="NewPassword">New Password</label>
+                                <input type="password" class="form-control" id="NewPassword" placeholder="Enter New Password" name="NewPassword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-right">
+                        <button type="submit" class="btn btn-primary">Save Password</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

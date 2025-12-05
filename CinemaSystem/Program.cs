@@ -4,6 +4,8 @@ using CinemaSystem.Models;
 using CinemaSystem.Repositories.IRepositories;
 using CinemaSystem.Repository;
 using CinemaSystem.Utilies;
+using CinemaSystem.Utilies.DBInitializer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -27,8 +29,14 @@ namespace CinemaSystem
             {
                 confi.User.RequireUniqueEmail = true;
                 confi.Password.RequiredLength = 7;
-            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); 
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                //options.ExpireTimeSpan = 
+            }); 
             // Authorization
             builder.Services.AddAuthorization();
 
@@ -54,8 +62,15 @@ namespace CinemaSystem
 
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddScoped<IRepository<ApplicationUserOTP>, Repository< ApplicationUserOTP>>();
-
+            builder.Services.AddScoped<IDBInitializer, DBInitializer>();
+            builder.Services.AddScoped<IRepository<Cart>, Repository<Cart>>();
+            builder.Services.AddScoped<IRepository<Promotion>, Repository<Promotion>>();
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var initializer = scope.ServiceProvider.GetRequiredService<IDBInitializer>();
+                initializer.Initialize();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

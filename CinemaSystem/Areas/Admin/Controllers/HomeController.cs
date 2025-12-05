@@ -2,13 +2,17 @@
 using CinemaSystem.DataAcess;
 using CinemaSystem.Models;
 using CinemaSystem.Repositories.IRepositories;
+using CinemaSystem.Utilies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 
 namespace CinemaSystem.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize (Roles =$"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class HomeController : Controller
     {
         ApplicationDbContext _context;// = new ApplicationDbContext();
@@ -17,13 +21,16 @@ namespace CinemaSystem.Areas.Admin.Controllers
         private IRepository<Category> _categoryRepository;
         private IRepository<Movie> _movieRepository;
         private IRepository<Booking> _bookingRepository;
-        public HomeController(IRepository<Cinema> CinemaRepository, IRepository<Actor> ActorRepository, IRepository<Category> categoryRepository, IRepository<Movie> movieRepository, IRepository<Booking> bookingRepository)
+        private IRepository<Promotion> _promotionRepository;
+
+        public HomeController(IRepository<Cinema> CinemaRepository, IRepository<Actor> ActorRepository, IRepository<Category> categoryRepository, IRepository<Movie> movieRepository, IRepository<Booking> bookingRepository, IRepository<Promotion> promotionRepository)
         {
             _ActorRepository = ActorRepository;
             _categoryRepository = categoryRepository;
             _movieRepository = movieRepository;
             _CinemaRepository = CinemaRepository;
             _bookingRepository = bookingRepository;
+            _promotionRepository = promotionRepository;
         }
         public async Task<IActionResult> Index(Models.Movie movie)
         {
@@ -37,6 +44,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return View(model);
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id)
         {
             /* var movie = _context.movies
@@ -128,6 +136,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
 
       }*/
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id, Movie movie, IFormFile? formFile, List<IFormFile>? subimgs)
         {
             // جلب الفيلم من قاعدة البيانات مع جميع العلاقات
@@ -220,6 +229,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
 
              return RedirectToAction("Index");
          }*/
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int ID)
         {
             // 1. جلب الفيلم
@@ -259,6 +269,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return View();
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> EditCategory(int id)
         {
             //var movie = _context.movies.Include(e => e.category).AsEnumerable().FirstOrDefault(e => e.ID == id);
@@ -278,6 +289,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
         }
      
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> EditCategory(int id, Category categoryForm)
         {
             //  
@@ -295,6 +307,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> EditCinema(int id )
         {
             //var c = _context.movies.Include(e=>e.cinemas).FirstOrDefault(c => c.ID == id);
@@ -308,6 +321,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
 
         }
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> EditCinema(int id,Cinema cinema, IFormFile? Img)
         {
 
@@ -341,7 +355,35 @@ namespace CinemaSystem.Areas.Admin.Controllers
           await  _categoryRepository.CommitAsync();
             return RedirectToAction("Index");
         }
-
-
+        [HttpGet]
+        public async Task<IActionResult> Createpromotion()
+        {
+            var movie =await  _movieRepository.GetAsync(tracked: false); // لجلب كل الأفلام للـ dropdown
+            return View(movie);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Createpromotion(string code, decimal discount, int movieId, DateTime? validTo, int maxUsage = 100)
+        {
+            var promotion = new Promotion
+            {
+                Code = code,
+                Discount = discount,
+                MovieId = movieId,
+                ValidTo = validTo ?? DateTime.UtcNow.AddDays(7),
+                MaxUsage = maxUsage,
+                isValid = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _promotionRepository.CreateAsync(promotion);
+            await _promotionRepository.CommitAsync();
+
+            TempData["success-notification"] = "Promotion added successfully!";
+            return RedirectToAction("Index"); // صفحة عرض جميع Promotions
+        }
+    }
+
+
 }
+

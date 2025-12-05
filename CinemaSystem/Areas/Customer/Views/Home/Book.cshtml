@@ -48,6 +48,26 @@
                         <label class="form-label">Tickets</label>
                         <input type="number" name="tickets" class="form-control" min="1" value="1" required />
                     </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body p-4 d-flex flex-row">
+                           
+                                <div data-mdb-input-init class="form-outline flex-fill">
+                                    <input type="text" id="form1" class="form-control form-control-lg" name="code" />
+                                    <label class="form-label" for="form1">Discound code</label>
+                                </div>
+                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-warning btn-lg my-3">Apply</button>
+                        
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-warning btn-block btn-lg">Proceed to Pay</button>
+                        </div>
+                    </div>
+
+                    
                     <button type="submit" class="btn btn-primary">Confirm Booking</button>
                 </form>
 
